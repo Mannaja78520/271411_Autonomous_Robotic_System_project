@@ -1,0 +1,18 @@
+# Named goal poses inside the smart_building world (frame: map).
+# x, y in metres, yaw in degrees.  Used by scripts/nav_to_room.py.
+locations:
+  home:            {x: -13.50, y:   0.00, yaw:    0.0}   # corridor, spawn point
+  corridor_west:   {x: -11.00, y:   0.00, yaw:    0.0}
+  corridor_centre: {x:   0.00, y:   0.00, yaw:    0.0}
+  corridor_east:   {x:  12.00, y:   0.00, yaw:  180.0}
+
+  reception:       {x: -10.00, y:   4.50, yaw:  180.0}
+  lounge:          {x:  -8.90, y:   7.90, yaw:   90.0}
+  server_room:     {x: -13.05, y:  11.00, yaw:   90.0}
+  office:          {x:  -1.50, y:   7.00, yaw:   90.0}
+  meeting_room:    {x:   9.00, y:   5.00, yaw:   90.0}
+
+  warehouse:       {x:  -6.20, y:  -9.50, yaw:  180.0}
+  cafeteria:       {x:   1.60, y:  -8.20, yaw:  -90.0}
+  lab:             {x:  12.00, y:  -6.00, yaw:  -90.0}
+  lab_test_area:   {x:  12.00, y: -12.00, yaw:  -90.0}

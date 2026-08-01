@@ -1,0 +1,7 @@
+keyboard_control_node:
+  ros__parameters:
+    max_speed: 1.5          # m/s ceiling applied to linear and angular commands
+    plus_move_speed: 0.15   # m/s added per 'w' / 's' press
+    plus_slide_speed: 0.15  # m/s added per 'a' / 'd' press (swerve only)
+    plus_turn_speed: 0.30   # rad/s added per 'q' / 'e' press
+    plus_speed_size: 0.01   # step used by the capital-letter keys

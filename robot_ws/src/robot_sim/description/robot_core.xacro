@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ==================================================================
+         Mobile base: 4 driven wheels, skid-steer (differential) kinematics.
+         The left pair and the right pair are commanded as one virtual
+         differential drive by the Gazebo plugin in gazebo_control.xacro.
+         ================================================================== -->
+
+    <!-- Geometry constants (metres) -->
+    <xacro:property name="chassis_length" value="0.50"/>
+    <xacro:property name="chassis_width"  value="0.42"/>
+    <xacro:property name="chassis_height" value="0.18"/>
+    <xacro:property name="wheel_radius"   value="0.09"/>
+    <xacro:property name="wheel_width"    value="0.05"/>
+    <xacro:property name="wheel_x"        value="0.17"/>   <!-- half wheel base -->
+    <xacro:property name="wheel_y"        value="0.215"/>  <!-- half track width -->
+
+    <material name="white">  <color rgba="1 1 1 1"/>          </material>
+    <material name="orange"> <color rgba="1 0.45 0.05 1"/>    </material>
+    <material name="blue">   <color rgba="0.2 0.2 1 1"/>      </material>
+    <material name="black">  <color rgba="0.05 0.05 0.05 1"/> </material>
+    <material name="gray">   <color rgba="0.5 0.5 0.5 1"/>    </material>
+
+    <!-- BASE LINK: origin sits on the wheel axle centre line -->
+    <link name="base_link"/>
+
+    <!-- BASE FOOTPRINT: projection of base_link onto the floor -->
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link"/>
+        <child  link="base_footprint"/>
+        <origin xyz="0 0 -${wheel_radius}" rpy="0 0 0"/>
+    </joint>
+    <link name="base_footprint"/>
+
+    <!-- CHASSIS -->
+    <joint name="chassis_joint" type="fixed">
+        <parent link="base_link"/>
+        <child  link="chassis"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="chassis">
+        <visual>
+            <origin xyz="0 0 ${chassis_height/2 + 0.04}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 ${chassis_height/2 + 0.04}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="18.0" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
+            <origin xyz="0 0 ${chassis_height/2 + 0.04}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+    <gazebo reference="chassis">
+        <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <!-- SENSOR MAST: raises the LiDAR above the chassis deck -->
+    <joint name="mast_joint" type="fixed">
+        <parent link="chassis"/>
+        <child  link="mast"/>
+        <origin xyz="0.12 0 ${chassis_height + 0.04}" rpy="0 0 0"/>
+    </joint>
+
+    <link name="mast">
+        <visual>
+            <origin xyz="0 0 0.045" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.035" length="0.09"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.045" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.035" length="0.09"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.4" length="0.09" radius="0.035">
+            <origin xyz="0 0 0.045" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+    <gazebo reference="mast">
+        <material>Gazebo/FlatBlack</material>
+    </gazebo>
+
+    <!-- ================== WHEELS ================== -->
+    <!-- prefix: front_left / front_right / back_left / back_right
+         x_sign: +1 front, -1 back      y_sign: +1 left, -1 right -->
+    <xacro:macro name="drive_wheel" params="prefix x_sign y_sign colour gz_colour">
+        <joint name="${prefix}_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child  link="${prefix}_wheel"/>
+            <origin xyz="${x_sign * wheel_x} ${y_sign * wheel_y} 0"
+                    rpy="${-y_sign * pi/2} 0 0"/>
+            <axis xyz="0 0 ${y_sign}"/>
+            <dynamics damping="0.05" friction="0.05"/>
+        </joint>
+
+        <link name="${prefix}_wheel">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+                <material name="${colour}"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+            </collision>
+            <xacro:inertial_cylinder mass="1.5" length="${wheel_width}" radius="${wheel_radius}">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+            </xacro:inertial_cylinder>
+        </link>
+
+        <gazebo reference="${prefix}_wheel">
+            <material>Gazebo/${gz_colour}</material>
+            <!-- Skid-steer friction.  fdir1 is REQUIRED here: without it ODE
+                 picks the first friction direction itself and it ends up fixed
+                 in the world, not on the wheel, so mu1/mu2 stop meaning
+                 "rolling/lateral" and the base can only turn when it happens to
+                 be aligned with a world axis.  fdir1 = 0 0 1 is the wheel's own
+                 axle (local z), which makes mu1 the sideways-scrub coefficient
+                 and mu2 the rolling one.  Low scrub + high roll is what lets a
+                 4-wheel skid-steer spin on the spot. -->
+            <fdir1>0 0 1</fdir1>
+            <mu1>0.2</mu1>
+            <mu2>1.0</mu2>
+            <kp>1000000.0</kp>
+            <kd>10.0</kd>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:drive_wheel prefix="front_left"  x_sign="1"  y_sign="1"  colour="black" gz_colour="FlatBlack"/>
+    <xacro:drive_wheel prefix="front_right" x_sign="1"  y_sign="-1" colour="black" gz_colour="FlatBlack"/>
+    <xacro:drive_wheel prefix="back_left"   x_sign="-1" y_sign="1"  colour="black" gz_colour="FlatBlack"/>
+    <xacro:drive_wheel prefix="back_right"  x_sign="-1" y_sign="-1" colour="black" gz_colour="FlatBlack"/>
+
+</robot>

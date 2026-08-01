@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ==================================================================
+         Skid-steer drive: the two left wheels and the two right wheels are
+         declared as two wheel pairs of a single differential drive plugin,
+         so /cmd_vel (linear.x, angular.z) drives all four wheels.
+         ================================================================== -->
+
+    <gazebo>
+        <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+            <ros>
+                <remapping>cmd_vel:=cmd_vel</remapping>
+                <remapping>odom:=odom</remapping>
+            </ros>
+
+            <update_rate>50</update_rate>
+
+            <!-- Wheel pairs: index 0 = front axle, index 1 = rear axle -->
+            <num_wheel_pairs>2</num_wheel_pairs>
+            <left_joint>front_left_wheel_joint</left_joint>
+            <right_joint>front_right_wheel_joint</right_joint>
+            <left_joint>back_left_wheel_joint</left_joint>
+            <right_joint>back_right_wheel_joint</right_joint>
+
+            <wheel_separation>0.43</wheel_separation>
+            <wheel_diameter>0.18</wheel_diameter>
+            <wheel_separation>0.43</wheel_separation>
+            <wheel_diameter>0.18</wheel_diameter>
+
+            <!-- Limits -->
+            <max_wheel_torque>60</max_wheel_torque>
+            <max_wheel_acceleration>4.0</max_wheel_acceleration>
+
+            <!-- Output -->
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+            <odometry_source>1</odometry_source>
+
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>false</publish_wheel_tf>
+        </plugin>
+    </gazebo>
+
+    <!-- Joint states for robot_state_publisher (wheel spin in RViz) -->
+    <gazebo>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <ros>
+                <remapping>~/out:=joint_states</remapping>
+            </ros>
+            <update_rate>30</update_rate>
+            <joint_name>front_left_wheel_joint</joint_name>
+            <joint_name>front_right_wheel_joint</joint_name>
+            <joint_name>back_left_wheel_joint</joint_name>
+            <joint_name>back_right_wheel_joint</joint_name>
+        </plugin>
+    </gazebo>
+
+</robot>

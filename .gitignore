@@ -1,0 +1,19 @@
+# Sub-projects with their own git repositories
+271201-Lab_ws/
+swerve_drive_differential_v1/
+
+# ROS 2 colcon build artifacts
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Editor / OS
+.vscode/
+*.swp
+.DS_Store

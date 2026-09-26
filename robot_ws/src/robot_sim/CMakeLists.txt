@@ -18,6 +18,10 @@ install(
     scripts/auto_patrol.py
     scripts/lidar_monitor.py
     scripts/nav_to_room.py
+    scripts/lidar_logger.py
+    scripts/capture_topview.py
+    scripts/path_follower.py
+    scripts/live_ocgm.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

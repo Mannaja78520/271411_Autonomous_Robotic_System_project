@@ -86,6 +86,8 @@ def generate_launch_description():
         arguments=[
             '-topic', 'robot_description',
             '-entity', 'scout_bot',
+            # Loading the 162-model world can take longer than the default 30 s.
+            '-timeout', '180',
             '-x', LaunchConfiguration('x'),
             '-y', LaunchConfiguration('y'),
             '-z', LaunchConfiguration('z'),

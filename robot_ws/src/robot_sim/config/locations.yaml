@@ -16,3 +16,12 @@ locations:
   cafeteria:       {x:   1.60, y:  -8.20, yaw:  -90.0}
   lab:             {x:  12.00, y:  -6.00, yaw:  -90.0}
   lab_test_area:   {x:  12.00, y: -12.00, yaw:  -90.0}
+
+  # Extra stops used only by scripts/path_follower.py so the mapping tour
+  # also sees the far side of the larger rooms.
+  office_north:    {x:  -1.50, y:  11.00, yaw:   90.0}
+  meeting_north:   {x:   8.00, y:  12.00, yaw:   90.0}
+  lab_north:       {x:   7.00, y:  -4.00, yaw:  180.0}
+  warehouse_aisle1: {x: -12.00, y:  -6.30, yaw:  180.0}
+  warehouse_aisle2: {x: -10.00, y:  -9.30, yaw:  180.0}
+  warehouse_aisle3: {x: -10.00, y: -12.30, yaw:  180.0}

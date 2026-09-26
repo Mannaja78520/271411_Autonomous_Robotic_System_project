@@ -5,8 +5,9 @@
 SHELL := /bin/bash
 WS    := $(shell pwd)
 SETUP := source /opt/ros/humble/setup.bash && source $(WS)/install/setup.bash
+OCGM  := $(abspath $(WS)/../ocgm_660610840)
 
-.PHONY: help build clean world check sim gui slam nav2 rviz teleop patrol lidar rooms savemap kill
+.PHONY: help build clean world check sim gui slam nav2 rviz teleop patrol lidar rooms savemap kill record topview ocgm tour livemap
 
 help:
 	@echo "make build     - colcon build the workspace"
@@ -22,6 +23,11 @@ help:
 	@echo "make lidar     - print live LiDAR sector distances"
 	@echo "make rooms     - list the named Nav2 goals"
 	@echo "make savemap   - save the current SLAM map into src/robot_sim/maps"
+	@echo "make record    - log /scan + ground-truth pose into ../ocgm_660610840/data.csv"
+	@echo "make tour      - drive every room + live OCGM window, saves data.csv/ocgm csv (needs 'make sim')"
+	@echo "make livemap   - live OCGM window + data.csv while you drive yourself (make teleop)"
+	@echo "make topview   - save a to-scale top view of the world (needs 'make sim')"
+	@echo "make ocgm      - build the occupancy grid map from data.csv and plot it"
 	@echo "make clean     - remove build/ install/ log/"
 	@echo "make kill      - kill leftover gazebo processes"
 
@@ -72,3 +78,18 @@ savemap:
 kill:
 	-pkill -9 -f gzserver
 	-pkill -9 -f gzclient
+
+record:
+	$(SETUP) && ros2 run robot_sim lidar_logger.py --ros-args -p output:=$(OCGM)/data.csv
+
+tour:
+	$(SETUP) && ros2 launch robot_sim tour.launch.py output_dir:=$(OCGM)
+
+livemap:
+	$(SETUP) && ros2 run robot_sim live_ocgm.py --ros-args -p output:=$(OCGM)/data.csv
+
+topview:
+	$(SETUP) && ros2 run robot_sim capture_topview.py --ros-args -p output:=$(OCGM)/topview.png
+
+ocgm:
+	cd $(OCGM) && python3 myworld_ocgm_660610840.py

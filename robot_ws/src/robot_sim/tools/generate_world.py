@@ -618,6 +618,15 @@ HEADER = """<?xml version="1.0" ?>
       <real_time_update_rate>500</real_time_update_rate>
     </physics>
 
+    <!-- /get_entity_state and /set_entity_state services, used by
+         scripts/path_follower.py to move the robot along a planned path -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+      <ros>
+        <namespace>/</namespace>
+      </ros>
+      <update_rate>50.0</update_rate>
+    </plugin>
+
     <gui>
       <camera name="user_camera">
         <pose>-20 -20 22 0 0.72 0.78</pose>

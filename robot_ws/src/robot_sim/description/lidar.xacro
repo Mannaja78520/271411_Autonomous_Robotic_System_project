@@ -48,7 +48,9 @@
             <ray>
                 <scan>
                     <horizontal>
-                        <samples>720</samples>
+                        <!-- 684 beams, same count as the CoppeliaSim
+                             OCGM example (data.csv has 684 range/angle pairs) -->
+                        <samples>684</samples>
                         <resolution>1</resolution>
                         <min_angle>-3.141592</min_angle>
                         <max_angle>3.141592</max_angle>
